@@ -1,0 +1,142 @@
+.review-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a3a5c;
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: #6b7280;
+}
+
+.upload-card {
+  margin-bottom: 24px;
+}
+
+.upload-zone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.upload-zone:hover,
+.upload-zone.dragging {
+  border-color: #2563a8;
+  background: #f0f7ff;
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.upload-text {
+  font-size: 16px;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.upload-hint {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.upload-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.review-progress {
+  padding: 32px;
+}
+
+.progress-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a3a5c;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step-item {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.step-summary {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.step-error {
+  font-size: 13px;
+  color: #dc2626;
+}
+
+/* 审核完成 */
+.review-complete {
+  text-align: center;
+  padding: 48px 32px;
+}
+
+.complete-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+}
+
+.complete-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a3a5c;
+  margin-bottom: 12px;
+}
+
+.complete-text {
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.complete-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}

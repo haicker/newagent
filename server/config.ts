@@ -1,0 +1,34 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+export const config = {
+  port: process.env.PORT || 3000,
+
+  // 语言模型配置（对话/审核）
+  llm: {
+    apiKey: process.env.LLM_API_KEY || '',
+    baseURL: process.env.LLM_BASE_URL || 'https://api.openai.com/v1',
+    model: process.env.LLM_MODEL || 'gpt-4-turbo-preview',
+  },
+
+  // 向量化模型配置（Embedding）
+  embedding: {
+    apiKey: process.env.EMBEDDING_API_KEY || '',
+    baseURL: process.env.EMBEDDING_BASE_URL || 'https://api.openai.com/v1',
+    model: process.env.EMBEDDING_MODEL || 'text-embedding-3-small',
+    dimension: parseInt(process.env.EMBEDDING_DIMENSION || '1536'),
+  },
+
+  upload: {
+    maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '10485760'), // 10MB
+    allowedTypes: ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+  },
+
+  paths: {
+    uploads: './uploads',
+    regulations: './data/regulations',
+    reports: './data/reports',
+    vectorDb: './data/vector_db',
+  }
+};

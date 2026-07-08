@@ -1,0 +1,241 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background: linear-gradient(135deg, #1a3a5c 0%, #2563a8 100%);
+  color: white;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-btn {
+  background: transparent;
+  color: rgba(255,255,255,0.8);
+  border: 1px solid transparent;
+  padding: 7px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.nav-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+.nav-btn.active {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border-color: rgba(255,255,255,0.4);
+}
+
+.app-main {
+  flex: 1;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* 通用卡片 */
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  border: 1px solid #e8ecf0;
+}
+
+/* 通用按钮 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #2563a8;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1d4f8e;
+}
+
+.btn-primary:disabled {
+  background: #a0b4cc;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.btn-danger:hover {
+  background: #fecaca;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #555;
+  border: 1px solid #ddd;
+}
+
+.btn-ghost:hover {
+  background: #f5f7fa;
+}
+
+/* 严重程度标签 */
+.severity-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.severity-critical {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.severity-major {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.severity-minor {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.severity-info {
+  background: #f0f9ff;
+  color: #0369a1;
+}
+
+/* 风险等级颜色 */
+.risk-critical { color: #dc2626; }
+.risk-high { color: #d97706; }
+.risk-medium { color: #ca8a04; }
+.risk-low { color: #16a34a; }
+
+/* 分数圆环 */
+.score-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border: 4px solid;
+}
+
+.score-circle .score-value {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.score-circle .score-label {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* 加载动画 */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-dark {
+  border-color: rgba(37,99,168,0.2);
+  border-top-color: #2563a8;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 步骤状态图标 */
+.step-status-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.step-pending { background: #e5e7eb; color: #6b7280; }
+.step-running { background: #dbeafe; color: #2563eb; }
+.step-completed { background: #dcfce7; color: #16a34a; }
+.step-error { background: #fee2e2; color: #dc2626; }
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #9ca3af;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-state-text {
+  font-size: 15px;
+}
