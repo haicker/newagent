@@ -5,6 +5,7 @@ import { config } from '../config.js';
 import { ReviewService } from '../services/reviewService.js';
 import { AIService } from '../services/aiService.js';
 import { vectorStore } from '../services/vectorStore.js';
+import { decodeFileName } from '../utils/fileName.js';
 import type { ChatRequest, StepResult } from '../../shared/types.js';
 
 const router = Router();
@@ -12,18 +13,27 @@ const reviewService = new ReviewService();
 const aiService = new AIService();
 
 // 存储审核进度（内存中）
-const reviewProgress = new Map<string, {
+interface ReviewProgress {
   reportId?: string;
   steps: StepResult[];
   status: 'running' | 'completed' | 'error';
   error?: string;
   fileName: string;
-}>();
-
-// 修复中文文件名乱码
-function decodeFileName(name: string): string {
-  return Buffer.from(name, 'latin1').toString('utf8');
+  createdAt: number;
+  finishedAt?: number;
 }
+const reviewProgress = new Map<string, ReviewProgress>();
+
+// 定期清理已完成的审核进度（30 分钟后自动删除，防止内存泄漏）
+const PROGRESS_TTL_MS = 30 * 60 * 1000;
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, progress] of reviewProgress) {
+    if (progress.finishedAt && now - progress.finishedAt > PROGRESS_TTL_MS) {
+      reviewProgress.delete(id);
+    }
+  }
+}, 5 * 60 * 1000); // 每 5 分钟清理一次
 
 // 配置 multer 文件上传
 const storage = multer.diskStorage({
@@ -65,6 +75,7 @@ router.post('/upload', upload.single('file'), async (req: Request, res: Response
     status: 'running',
     steps: [],
     fileName: decodedName,
+    createdAt: Date.now(),
   });
 
   // 立即返回 progressId，前端通过轮询获取进度
@@ -93,6 +104,7 @@ router.post('/upload', upload.single('file'), async (req: Request, res: Response
     if (progress) {
       progress.status = 'completed';
       progress.reportId = report.id;
+      progress.finishedAt = Date.now();
     }
   } catch (err: any) {
     console.error('[Review] 审核失败:', err.message);
@@ -100,6 +112,7 @@ router.post('/upload', upload.single('file'), async (req: Request, res: Response
     if (progress) {
       progress.status = 'error';
       progress.error = err.message || '审核失败';
+      progress.finishedAt = Date.now();
     }
   } finally {
     try {

@@ -1,7 +1,7 @@
 {
   "name": "pit-support-review-system",
-  "version": "0.1.0",
-  "description": "AI�动的深基坑支护方案审核系统",
+  "version": "0.1.1",
+  "description": "AI驱动的深基坑支护方案审核系统",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",

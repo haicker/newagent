@@ -335,7 +335,7 @@ ${findingsSummary.substring(0, 3000)}
       const json = content.replace(/```json\n?|\n?```/g, '').trim();
       return JSON.parse(json);
     } catch {
-      const score = Math.max(0, 100 - criticalCount * 20 - majorCount * 8 - minorCount * 2);
+      const score = Math.max(0, 100 - criticalCount * 10 - majorCount * 5 - minorCount * 2);
       return {
         score,
         assessment: `方案共发现 ${allFindings.length} 项问题，其中严重 ${criticalCount} 项，重要 ${majorCount} 项，一般 ${minorCount} 项。请按严重程度优先整改。`,

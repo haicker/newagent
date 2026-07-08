@@ -3,13 +3,10 @@ import multer from 'multer';
 import fs from 'fs/promises';
 import { config } from '../config.js';
 import { RegulationService } from '../services/regulationService.js';
+import { decodeFileName } from '../utils/fileName.js';
 
 const router = Router();
 const regulationService = new RegulationService();
-
-function decodeFileName(name: string): string {
-  return Buffer.from(name, 'latin1').toString('utf8');
-}
 
 const storage = multer.diskStorage({
   destination: async (_req, _file, cb) => {

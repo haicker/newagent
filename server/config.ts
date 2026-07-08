@@ -21,7 +21,6 @@ export const config = {
   },
 
   upload: {
-    maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '10485760'), // 10MB
     allowedTypes: ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
   },
 

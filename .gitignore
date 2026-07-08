@@ -2,6 +2,7 @@ node_modules/
 dist/
 .env
 uploads/
+data/
 *.log
 .DS_Store
 client/dist/

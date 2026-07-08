@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAppStore } from '../store';
@@ -32,21 +32,21 @@ const ReportsPage: React.FC = () => {
     loadReports();
   }, []);
 
+  const openReport = useCallback(async (id: string) => {
+    const res = await fetch(`/api/review/reports/${id}`);
+    const data = await res.json();
+    setSelectedReport(data);
+    setChatMessages([]);
+    setActiveTab('overview');
+  }, []);
+
   // 从其他页面跳转过来时自动打开指定报告
   useEffect(() => {
     if (viewingReportId) {
       openReport(viewingReportId);
       setViewingReportId(null); // 清除，避免重复触发
     }
-  }, [viewingReportId]);
-
-  const openReport = async (id: string) => {
-    const res = await fetch(`/api/review/reports/${id}`);
-    const data = await res.json();
-    setSelectedReport(data);
-    setChatMessages([]);
-    setActiveTab('overview');
-  };
+  }, [viewingReportId, openReport, setViewingReportId]);
 
   const deleteReport = async (id: string) => {
     if (!confirm('确定删除此报告？')) return;

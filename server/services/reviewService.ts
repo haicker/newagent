@@ -173,7 +173,14 @@ export class ReviewService {
    */
   async deleteReport(id: string): Promise<void> {
     const filePath = path.join(config.paths.reports, `${id}.json`);
-    await fs.unlink(filePath);
+    try {
+      await fs.unlink(filePath);
+    } catch (err: any) {
+      if (err.code !== 'ENOENT') {
+        throw err;
+      }
+      // 文件不存在，忽略
+    }
     // 同步删除该报告关联的方案原文向量
     try {
       await vectorStore.deleteSchemeByReportId(id);

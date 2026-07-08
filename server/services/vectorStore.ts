@@ -59,6 +59,13 @@ export class VectorStore {
   }
 
   /**
+   * 转义 SQL 过滤条件中的单引号，防止注入
+   */
+  private escapeSqlValue(value: string): string {
+    return value.replace(/'/g, "''");
+  }
+
+  /**
    * 初始化 LanceDB 连接
    */
   async initialize(): Promise<void> {
@@ -339,10 +346,10 @@ export class VectorStore {
     // 添加过滤条件
     const filters: string[] = [];
     if (options?.category) {
-      filters.push(`category = '${options.category}'`);
+      filters.push(`category = '${this.escapeSqlValue(options.category)}'`);
     }
     if (options?.province) {
-      filters.push(`province = '${options.province}'`);
+      filters.push(`province = '${this.escapeSqlValue(options.province)}'`);
     }
     if (options?.isMandatory !== undefined) {
       filters.push(`is_mandatory = '${options.isMandatory ? 'true' : 'false'}'`);
@@ -372,7 +379,8 @@ export class VectorStore {
   async deleteByRegulationId(regulationId: string): Promise<void> {
     await this.initialize();
     if (!this.table) return;
-    await this.table.delete(`regulation_id = '${regulationId}'`);
+    const safeId = this.escapeSqlValue(regulationId);
+    await this.table.delete(`regulation_id = '${safeId}'`);
   }
 
   // ============ 方案原文 RAG ============
@@ -543,9 +551,10 @@ export class VectorStore {
     await this.initialize();
     if (!this.table) return [];
 
+    const safeProvince = this.escapeSqlValue(province);
     const results = await this.table
       .query()
-      .where(`category = 'local' AND province = '${province}'`)
+      .where(`category = 'local' AND province = '${safeProvince}'`)
       .toArray();
 
     return results.map(
