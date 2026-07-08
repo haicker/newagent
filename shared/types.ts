@@ -82,3 +82,18 @@ export interface ChatRequest {
   message: string;
   history: ChatMessage[];
 }
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: AuthUser;
+}
+
+export interface AuthUser {
+  username: string;
+  name: string;
+}

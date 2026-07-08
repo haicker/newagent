@@ -3,6 +3,8 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { config } from './config.js';
+import authRouter from './routes/auth.js';
+import { authRequired } from './middleware/auth.js';
 import reviewRouter from './routes/review.js';
 import regulationsRouter from './routes/regulations.js';
 
@@ -15,8 +17,11 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // API 路由
-app.use('/api/review', reviewRouter);
-app.use('/api/regulations', regulationsRouter);
+// 认证路由（无需鉴权）
+app.use('/api/auth', authRouter);
+// 以下路由需要登录
+app.use('/api/review', authRequired, reviewRouter);
+app.use('/api/regulations', authRequired, regulationsRouter);
 
 // 健康检查
 app.get('/api/health', (_req, res) => {

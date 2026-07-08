@@ -2,11 +2,17 @@ import React from 'react';
 import ReviewPage from './pages/ReviewPage';
 import RegulationsPage from './pages/RegulationsPage';
 import ReportsPage from './pages/ReportsPage';
+import LoginPage from './pages/LoginPage';
 import { useAppStore } from './store';
 import './App.css';
 
 const App: React.FC = () => {
-  const { currentPage, setCurrentPage } = useAppStore();
+  const { currentPage, setCurrentPage, token, user, logout } = useAppStore();
+
+  // 未登录时显示登录页
+  if (!token) {
+    return <LoginPage />;
+  }
 
   return (
     <div className="app">
@@ -35,6 +41,12 @@ const App: React.FC = () => {
             法规库
           </button>
         </nav>
+        <div className="header-user">
+          <span className="user-name">{user?.name || '用户'}</span>
+          <button className="nav-btn logout-btn" onClick={logout}>
+            退出
+          </button>
+        </div>
       </header>
 
       <main className="app-main">

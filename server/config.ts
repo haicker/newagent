@@ -24,6 +24,14 @@ export const config = {
     allowedTypes: ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
   },
 
+  // 认证配置
+  auth: {
+    username: process.env.AUTH_USERNAME || 'admin',
+    password: process.env.AUTH_PASSWORD || 'admin123',
+    jwtSecret: process.env.JWT_SECRET || 'default-secret-change-me',
+    tokenExpiry: '7d',
+  },
+
   paths: {
     uploads: './uploads',
     regulations: './data/regulations',

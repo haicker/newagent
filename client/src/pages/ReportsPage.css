@@ -521,3 +521,172 @@
   border-color: #2563a8;
   box-shadow: 0 0 0 3px rgba(37,99,168,0.1);
 }
+
+/* 移动端返回按钮（默认隐藏） */
+.detail-back-btn {
+  display: none;
+}
+
+/* ====== 移动端适配 ====== */
+@media (max-width: 768px) {
+  .reports-page {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 84px);
+    gap: 0;
+  }
+
+  /* 列表全宽 */
+  .reports-list,
+  .reports-list.has-detail {
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  /* 选中报告时隐藏列表 */
+  .reports-list.has-detail {
+    display: none;
+  }
+
+  /* 详情面板全宽 */
+  .report-detail {
+    flex: none;
+    width: 100%;
+    min-height: calc(100vh - 84px);
+  }
+
+  /* 显示返回按钮 */
+  .detail-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: #2563a8;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 0;
+    margin-bottom: 8px;
+  }
+
+  .detail-header {
+    padding: 16px;
+  }
+
+  .detail-score-wrap {
+    gap: 14px;
+  }
+
+  .score-circle {
+    width: 70px;
+    height: 70px;
+    border-width: 3px;
+  }
+
+  .score-circle .score-value {
+    font-size: 22px;
+  }
+
+  .detail-project-name {
+    font-size: 16px;
+  }
+
+  .detail-tabs {
+    padding: 0 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .detail-overview,
+  .findings-list {
+    padding: 16px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .info-item {
+    padding: 8px 12px;
+  }
+
+  .assessment-box {
+    padding: 12px;
+  }
+
+  .step-summary-item {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .finding-item {
+    padding: 12px;
+  }
+
+  .finding-header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .finding-title {
+    font-size: 13px;
+  }
+
+  .finding-description {
+    font-size: 12px;
+  }
+
+  .finding-recommendation {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .chat-messages {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .chat-bubble {
+    max-width: 90%;
+  }
+
+  .chat-content {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .chat-input-bar {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .chat-input-bar textarea {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .list-header {
+    margin-bottom: 12px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .report-card {
+    padding: 14px;
+  }
+
+  .report-score-mini {
+    font-size: 18px;
+  }
+}

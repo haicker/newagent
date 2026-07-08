@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { apiFetch } from '../api';
 import type { Regulation } from '../types';
 import './RegulationsPage.css';
 
@@ -34,7 +35,7 @@ const RegulationsPage: React.FC = () => {
   const loadRegulations = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/regulations');
+      const res = await apiFetch('/api/regulations');
       const data = await res.json();
       setRegulations(data);
     } catch (e) {
@@ -62,7 +63,7 @@ const RegulationsPage: React.FC = () => {
       formData.append('category', form.category);
       if (form.province) formData.append('province', form.province);
 
-      const res = await fetch('/api/regulations/upload', {
+      const res = await apiFetch('/api/regulations/upload', {
         method: 'POST',
         body: formData,
       });
@@ -79,7 +80,7 @@ const RegulationsPage: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (!confirm('确定删除此法规？')) return;
-    await fetch(`/api/regulations/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api/regulations/${id}`, { method: 'DELETE' });
     loadRegulations();
   };
 
@@ -91,7 +92,7 @@ const RegulationsPage: React.FC = () => {
     setSearchResults(null);
     setSearchError(null);
     try {
-      const res = await fetch(`/api/regulations/search?keyword=${encodeURIComponent(searchKeyword)}`);
+      const res = await apiFetch(`/api/regulations/search?keyword=${encodeURIComponent(searchKeyword)}`);
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.error || `服务器错误 (${res.status})`);

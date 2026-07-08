@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAppStore } from '../store';
+import { apiFetch } from '../api';
 import type { StepResult } from '../types';
 import './ReviewPage.css';
 
@@ -47,7 +48,7 @@ const ReviewPage: React.FC = () => {
 
     try {
       // 1. 上传文件，获取 progressId
-      const response = await fetch('/api/review/upload', {
+      const response = await apiFetch('/api/review/upload', {
         method: 'POST',
         body: formData,
       });
@@ -60,7 +61,7 @@ const ReviewPage: React.FC = () => {
 
       // 2. 轮询进度
       const pollProgress = async () => {
-        const progressRes = await fetch(`/api/review/progress/${progressId}`);
+        const progressRes = await apiFetch(`/api/review/progress/${progressId}`);
         const progress = await progressRes.json();
 
         if (progress.error) {
@@ -108,7 +109,10 @@ const ReviewPage: React.FC = () => {
     <div className="review-page">
       <div className="page-header">
         <h1 className="page-title">方案审核</h1>
-        <p className="page-subtitle">上传深基坑支护及土方开挖专项施工方案，AI 将自动进行多维度审查</p>
+        <p className="page-subtitle">
+          上传深基坑支护及土方开挖专项施工方案，<br />
+          AI 将自动进行多维度审查
+        </p>
       </div>
 
       {!isReviewing && (

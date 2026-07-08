@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAppStore } from '../store';
+import { apiFetch } from '../api';
 import type { ReportSummary, ReviewReport, Finding, ChatMessage } from '../types';
 import './ReportsPage.css';
 
@@ -18,7 +19,7 @@ const ReportsPage: React.FC = () => {
   const loadReports = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/review/reports');
+      const res = await apiFetch('/api/review/reports');
       const data = await res.json();
       setReports(data);
     } catch (e) {
@@ -33,7 +34,7 @@ const ReportsPage: React.FC = () => {
   }, []);
 
   const openReport = useCallback(async (id: string) => {
-    const res = await fetch(`/api/review/reports/${id}`);
+    const res = await apiFetch(`/api/review/reports/${id}`);
     const data = await res.json();
     setSelectedReport(data);
     setChatMessages([]);
@@ -50,7 +51,7 @@ const ReportsPage: React.FC = () => {
 
   const deleteReport = async (id: string) => {
     if (!confirm('确定删除此报告？')) return;
-    await fetch(`/api/review/reports/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api/review/reports/${id}`, { method: 'DELETE' });
     if (selectedReport?.id === id) setSelectedReport(null);
     loadReports();
   };
@@ -59,7 +60,7 @@ const ReportsPage: React.FC = () => {
     if (!selectedReport) return;
     if (!confirm('确定删除该问题条目？删除后将重新计算分数。')) return;
     try {
-      const res = await fetch(`/api/review/reports/${selectedReport.id}/findings/${findingId}`, {
+      const res = await apiFetch(`/api/review/reports/${selectedReport.id}/findings/${findingId}`, {
         method: 'DELETE',
       });
       const updated: ReviewReport = await res.json();
@@ -76,7 +77,7 @@ const ReportsPage: React.FC = () => {
     setChatInput('');
     setChatLoading(true);
     try {
-      const res = await fetch('/api/review/chat', {
+      const res = await apiFetch('/api/review/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reportId: selectedReport.id, message: chatInput, history: chatMessages }),
@@ -155,6 +156,9 @@ const ReportsPage: React.FC = () => {
       {selectedReport && (
         <div className="report-detail">
           <div className="detail-header">
+            <button className="detail-back-btn" onClick={() => setSelectedReport(null)}>
+              ← 返回列表
+            </button>
             <div className="detail-score-wrap">
               <div className="score-circle" style={{
                 borderColor: getScoreColor(selectedReport.overallScore),
