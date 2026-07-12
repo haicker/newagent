@@ -22,7 +22,7 @@ router.post('/login', (req: Request, res: Response) => {
 
   const user = { username, name: username };
   const token = jwt.sign(user, config.auth.jwtSecret, {
-    expiresIn: config.auth.tokenExpiry,
+    expiresIn: config.auth.tokenExpiry as jwt.SignOptions['expiresIn'],
   });
 
   const response: LoginResponse = { token, user };
