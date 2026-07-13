@@ -14,6 +14,7 @@ const ReportsPage: React.FC = () => {
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'findings' | 'chat'>('overview');
+  const [exportingPdf, setExportingPdf] = useState(false);
   const { viewingReportId, setViewingReportId } = useAppStore();
 
   const loadReports = async () => {
@@ -37,7 +38,14 @@ const ReportsPage: React.FC = () => {
     const res = await apiFetch(`/api/review/reports/${id}`);
     const data = await res.json();
     setSelectedReport(data);
-    setChatMessages([]);
+    // 从后端恢复已持久化的对话消息
+    try {
+      const msgRes = await apiFetch(`/api/review/reports/${id}/messages`);
+      const msgData: ChatMessage[] = await msgRes.json();
+      setChatMessages(msgData);
+    } catch {
+      setChatMessages([]);
+    }
     setActiveTab('overview');
   }, []);
 
@@ -48,6 +56,31 @@ const ReportsPage: React.FC = () => {
       setViewingReportId(null); // 清除，避免重复触发
     }
   }, [viewingReportId, openReport, setViewingReportId]);
+
+  const exportPdf = async () => {
+    if (!selectedReport) return;
+    setExportingPdf(true);
+    try {
+      const res = await apiFetch(`/api/review/reports/${selectedReport.id}/pdf`);
+      if (!res.ok) throw new Error('导出失败');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const disposition = res.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename\*?=UTF-8''(.+)/);
+      a.download = match ? decodeURIComponent(match[1]) : `${selectedReport.projectInfo.projectName}_审核报告.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('PDF 导出失败:', e);
+      alert('PDF 导出失败，请稍后重试');
+    } finally {
+      setExportingPdf(false);
+    }
+  };
 
   const deleteReport = async (id: string) => {
     if (!confirm('确定删除此报告？')) return;
@@ -72,7 +105,8 @@ const ReportsPage: React.FC = () => {
 
   const sendChat = async () => {
     if (!chatInput.trim() || !selectedReport) return;
-    const userMsg: ChatMessage = { role: 'user', content: chatInput, timestamp: new Date().toISOString() };
+    const currentInput = chatInput;
+    const userMsg: ChatMessage = { role: 'user', content: currentInput, timestamp: new Date().toISOString() };
     setChatMessages(prev => [...prev, userMsg]);
     setChatInput('');
     setChatLoading(true);
@@ -80,7 +114,7 @@ const ReportsPage: React.FC = () => {
       const res = await apiFetch('/api/review/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportId: selectedReport.id, message: chatInput, history: chatMessages }),
+        body: JSON.stringify({ reportId: selectedReport.id, message: currentInput }),
       });
       const data = await res.json();
       const assistantMsg: ChatMessage = { role: 'assistant', content: data.answer, timestamp: new Date().toISOString() };
@@ -156,9 +190,18 @@ const ReportsPage: React.FC = () => {
       {selectedReport && (
         <div className="report-detail">
           <div className="detail-header">
-            <button className="detail-back-btn" onClick={() => setSelectedReport(null)}>
-              ← 返回列表
-            </button>
+            <div className="detail-header-top">
+              <button className="detail-back-btn" onClick={() => setSelectedReport(null)}>
+                ← 返回列表
+              </button>
+              <button
+                className="btn btn-export"
+                onClick={exportPdf}
+                disabled={exportingPdf}
+              >
+                {exportingPdf ? '导出中...' : '导出PDF'}
+              </button>
+            </div>
             <div className="detail-score-wrap">
               <div className="score-circle" style={{
                 borderColor: getScoreColor(selectedReport.overallScore),
@@ -204,6 +247,10 @@ const ReportsPage: React.FC = () => {
                 <h3>综合评估意见</h3>
                 <p>{selectedReport.comprehensiveAssessment}</p>
               </div>
+
+              {selectedReport.scoreBreakdown && (
+                <ScoreBreakdownCard breakdown={selectedReport.scoreBreakdown} />
+              )}
 
               <h3 style={{ marginBottom: 12, color: '#1a3a5c' }}>审核步骤</h3>
               <div className="steps-summary">
@@ -334,5 +381,69 @@ const InfoItem: React.FC<{ label: string; value: string }> = ({ label, value }) 
     <span className="info-value">{value || '-'}</span>
   </div>
 );
+
+// 扣分明细卡片
+const severityLabels: Record<string, string> = {
+  critical: '严重', major: '重要', minor: '一般', info: '提示',
+};
+const severityColors: Record<string, string> = {
+  critical: '#dc2626', major: '#d97706', minor: '#2563eb', info: '#6b7280',
+};
+
+const ScoreBreakdownCard: React.FC<{ breakdown: import('../types').ScoreBreakdown }> = ({ breakdown }) => {
+  return (
+    <div className="score-breakdown-card">
+      <h3>扣分明细</h3>
+      <div className="breakdown-summary">
+        <span>基础分</span>
+        <strong>{breakdown.baseScore}</strong>
+        <span>−</span>
+        <strong style={{ color: '#dc2626' }}>{breakdown.totalDeduction}</strong>
+        <span>=</span>
+        <strong style={{ color: '#16a34a', fontSize: 18 }}>{breakdown.finalScore}</strong>
+      </div>
+      {breakdown.deductions.length > 0 ? (
+        <table className="breakdown-table">
+          <thead>
+            <tr>
+              <th>严重度</th>
+              <th>数量</th>
+              <th>每条扣分</th>
+              <th>小计</th>
+            </tr>
+          </thead>
+          <tbody>
+            {breakdown.deductions.map(g => (
+              <tr key={g.severity}>
+                <td>
+                  <span
+                    className="breakdown-severity-tag"
+                    style={{ background: severityColors[g.severity] || '#6b7280' }}
+                  >
+                    {severityLabels[g.severity] || g.severity}
+                  </span>
+                </td>
+                <td>{g.count}</td>
+                <td>−{g.weightPerItem}</td>
+                <td style={{ fontWeight: 600, color: '#dc2626' }}>−{g.totalDeduction}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className="breakdown-no-deduction">无扣分项</div>
+      )}
+      {breakdown.aiSuggestedScore !== undefined && breakdown.aiSuggestedScore > 0 && (
+        <div className="breakdown-ai-suggest">
+          <span className="breakdown-ai-label">AI 建议分（仅参考）</span>
+          <span className="breakdown-ai-score">{breakdown.aiSuggestedScore}</span>
+          {breakdown.aiScoreReason && (
+            <span className="breakdown-ai-reason">{breakdown.aiScoreReason}</span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default ReportsPage;

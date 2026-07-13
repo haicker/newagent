@@ -286,12 +286,12 @@ ${documentText}
   }
 
   /**
-   * Step 5: 汇总报告生成
+   * Step 5: 生成综合评估意见（AI 只给建议分与理由，最终分由确定性引擎算出）
    */
   async generateSummaryReport(
     projectInfo: ProjectInfo,
     allFindings: Finding[]
-  ): Promise<{ score: number; assessment: string }> {
+  ): Promise<{ suggestedScore: number; assessment: string; scoreReason: string }> {
     const criticalCount = allFindings.filter(f => f.severity === 'critical').length;
     const majorCount = allFindings.filter(f => f.severity === 'major').length;
     const minorCount = allFindings.filter(f => f.severity === 'minor').length;
@@ -318,8 +318,9 @@ ${findingsSummary.substring(0, 3000)}
 
 请返回 JSON 格式：
 {
-  "score": 评分（0-100整数，根据问题数量和严重程度评定），
-  "assessment": "综合评估意见（200字以内，包含：整体评价、主要风险、整改优先级建议）"
+  "suggestedScore": 你的建议评分（0-100整数，基于问题的严重程度和数量给出你的专业判断，仅供参考，最终分由确定性引擎计算），
+  "assessment": "综合评估意见（200字以内，包含：整体评价、主要风险、整改优先级建议）",
+  "scoreReason": "给出建议评分的简要理由（50字以内，说明为什么建议这个分数）"
 }
 
 只返回 JSON。`;
@@ -333,12 +334,17 @@ ${findingsSummary.substring(0, 3000)}
     try {
       const content = response.choices[0].message.content || '{}';
       const json = content.replace(/```json\n?|\n?```/g, '').trim();
-      return JSON.parse(json);
-    } catch {
-      const score = Math.max(0, 100 - criticalCount * 10 - majorCount * 5 - minorCount * 2);
+      const parsed = JSON.parse(json);
       return {
-        score,
+        suggestedScore: typeof parsed.suggestedScore === 'number' ? parsed.suggestedScore : 0,
+        assessment: parsed.assessment || '',
+        scoreReason: parsed.scoreReason || '',
+      };
+    } catch {
+      return {
+        suggestedScore: 0,
         assessment: `方案共发现 ${allFindings.length} 项问题，其中严重 ${criticalCount} 项，重要 ${majorCount} 项，一般 ${minorCount} 项。请按严重程度优先整改。`,
+        scoreReason: 'AI 响应解析失败，未提供建议分',
       };
     }
   }
@@ -350,27 +356,34 @@ ${findingsSummary.substring(0, 3000)}
     userMessage: string,
     reportContext: string,
     schemeContext: string,
+    regulationContext: string,
     history: ChatMessage[]
   ): Promise<string> {
     const schemeSection = schemeContext
       ? `\n📄 方案原文片段（语义检索自用户上传的方案文档，是回答"方案里怎么写的"类问题的权威依据，应优先引用）：\n${schemeContext}\n`
       : '';
 
+    const regulationSection = regulationContext
+      ? `\n📖 法规标准条款（语义检索自已上传的法规库，是回答"规范怎么要求的/这条强条方案符不符合"等合规性问题的权威依据，应优先引用）：\n${regulationContext}\n`
+      : '';
+
     const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
       {
         role: 'system',
-        content: `你是深基坑支护工程施工方案审查专家。请基于以下审核报告和方案原文回答用户问题。
+        content: `你是深基坑支护工程施工方案审查专家。请基于以下审核报告、方案原文和法规标准回答用户问题。
 
 注意：审查对象是施工方案（施工组织文件），不是设计文件。不涉及结构设计计算（如抗突涌验算、边坡稳定验算、承载力验算等）。
 
 审核报告：
 ${reportContext}
-${schemeSection}
+${schemeSection}${regulationSection}
 请：
 1. 当用户询问"方案里/方案中怎么写的/如何规定的"等涉及原文的问题时，优先从"方案原文片段"中引用原文作答，并标明出处（如【方案原文 1】），不要凭空编造。
-2. 结合审核报告的 findings 进行解读和分析。
-3. 如果原文片段中没有相关信息，请根据审核报告或专业知识回答并说明来源。
-4. 回答要专业、简洁、实用`,
+2. 当用户询问"规范怎么要求的/这条强条方案符不符合/是否合规"等涉及法规的问题时，优先从"法规标准条款"中引用条款原文作答，并标明出处（如【法规条款 1】来源：JGJ 120-2012 第X条），不要凭空编造。标记【强条】的为强制性条文，必须严格遵守。
+3. 当用户询问合规性问题时，应交叉对比"方案原文"与"法规标准条款"，判断方案是否符合法规要求，并给出明确结论。
+4. 结合审核报告的 findings 进行解读和分析。
+5. 如果原文片段和法规条款中没有相关信息，请根据审核报告或专业知识回答并说明来源。
+6. 回答要专业、简洁、实用`,
       },
       ...history.map(m => ({
         role: m.role as 'user' | 'assistant',

@@ -100,6 +100,35 @@
   background: #f9fafb;
 }
 
+.detail-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.btn-export {
+  background: #2563a8;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-export:hover:not(:disabled) {
+  background: #1d4f8a;
+}
+
+.btn-export:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .detail-score-wrap {
   display: flex;
   align-items: center;
@@ -198,6 +227,104 @@
   font-size: 14px;
   color: #374151;
   line-height: 1.6;
+}
+
+/* 扣分明细卡片 */
+.score-breakdown-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.score-breakdown-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a3a5c;
+  margin-bottom: 12px;
+}
+
+.breakdown-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: white;
+  border-radius: 8px;
+}
+
+.breakdown-summary strong {
+  color: #1f2937;
+  font-size: 16px;
+}
+
+.breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.breakdown-table th {
+  background: #e5e7eb;
+  color: #374151;
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+}
+
+.breakdown-table td {
+  text-align: center;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.breakdown-severity-tag {
+  display: inline-block;
+  color: white;
+  font-size: 12px;
+  padding: 1px 8px;
+  border-radius: 4px;
+}
+
+.breakdown-no-deduction {
+  text-align: center;
+  color: #16a34a;
+  font-size: 14px;
+  padding: 8px;
+}
+
+.breakdown-ai-suggest {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  background: #fef3c7;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.breakdown-ai-label {
+  color: #92400e;
+  font-weight: 600;
+}
+
+.breakdown-ai-score {
+  color: #92400e;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.breakdown-ai-reason {
+  color: #a16207;
+  font-size: 12px;
 }
 
 .steps-summary {
@@ -567,7 +694,15 @@
     font-weight: 500;
     cursor: pointer;
     padding: 4px 0;
+  }
+
+  .detail-header-top {
     margin-bottom: 8px;
+  }
+
+  .btn-export {
+    padding: 4px 12px;
+    font-size: 12px;
   }
 
   .detail-header {

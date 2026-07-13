@@ -25,20 +25,39 @@ export interface Finding {
 export interface StepResult {
   stepNumber: number;
   stepName: string;
-  status: 'pending' | 'running' | 'completed' | 'error';
+  status: 'pending' | 'running' | 'completed' | 'error' | 'skipped';
   findings: Finding[];
   summary?: string;
   error?: string;
+}
+
+/** 扣分明细 —— 单一严重度的扣分汇总 */
+export interface DeductionGroup {
+  severity: 'critical' | 'major' | 'minor' | 'info';
+  count: number;
+  weightPerItem: number; // 每条扣分权重
+  totalDeduction: number; // 该组总扣分 = count * weightPerItem
+}
+
+/** 评分结果 —— 确定性引擎输出 */
+export interface ScoreBreakdown {
+  baseScore: number; // 基础分（100）
+  deductions: DeductionGroup[]; // 按严重度分组的扣分明细
+  totalDeduction: number; // 总扣分
+  finalScore: number; // 最终得分 = max(0, baseScore - totalDeduction)
+  aiSuggestedScore?: number; // AI 建议分（仅参考，不参与计算）
+  aiScoreReason?: string; // AI 建议分的理由
 }
 
 export interface ReviewReport {
   id: string;
   fileName: string;
   projectInfo: ProjectInfo;
-  overallScore: number; // 0-100
+  overallScore: number; // 0-100（确定性引擎计算）
   riskLevel: 'low' | 'medium' | 'high' | 'critical';
   steps: StepResult[];
   comprehensiveAssessment: string;
+  scoreBreakdown?: ScoreBreakdown; // 扣分明细
   createdAt: string;
 }
 
@@ -80,7 +99,7 @@ export interface ChatMessage {
 export interface ChatRequest {
   reportId: string;
   message: string;
-  history: ChatMessage[];
+  history?: ChatMessage[];
 }
 
 export interface LoginRequest {

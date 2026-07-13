@@ -35,7 +35,7 @@ app.get('*', (_req, res) => {
   res.sendFile(path.join(clientDist, 'index.html'));
 });
 
-app.listen(config.port, () => {
+const server = app.listen(config.port, () => {
   console.log(`服务器运行在 http://localhost:${config.port}`);
   if (!config.llm.apiKey) {
     console.warn('警告: LLM_API_KEY 未设置，请在 .env 文件中配置');
@@ -44,3 +44,8 @@ app.listen(config.port, () => {
     console.warn('警告: EMBEDDING_API_KEY 未设置，请在 .env 文件中配置');
   }
 });
+
+// 禁用 HTTP server 超时，防止长连接 SSE 被杀
+server.timeout = 0;           // 禁用请求超时（默认 120s 会断 SSE）
+server.keepAliveTimeout = 0;  // 禁用 keep-alive 超时
+server.headersTimeout = 0;    // 禁用请求头超时
